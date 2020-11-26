@@ -66,5 +66,11 @@ public class StringCalculatorTest {
         assertEquals(47, result);
     }
 
+    @Test
+    void whenGivenStringHasNegativeNumbers_ThrowError(){
+        RuntimeException thrown  = assertThrows(RuntimeException.class, () -> stringCalculator.checkLengthAndAdd("10,-1,5"));
+        assertTrue(thrown.getMessage().contains("negatives not allowed -1"));
+    }
+
 
 }

@@ -16,21 +16,32 @@ public class StringCalculator {
     }
 
 
-
     private Integer checkDelimiterAndAddNumbers(String s) {
-        if (s.startsWith("//"))  {
-            String delimiter = s.substring(2, 3);
-            String usefulString = extractUsefulString(s);
-            return add(delimiter, usefulString);
-        }
-        else return add(defaultDelimiter, s);
+        if (s.startsWith("//")) return extractDelimiterAndAdd(s);
+        else return checkNumbersAndAdd(defaultDelimiter, s);
     }
 
-    private Integer add(String delimiter, String s) {
+    private Integer extractDelimiterAndAdd(String s) {
+        String delimiter = s.substring(2, 3);
+        String string = extractString(s);
+        return checkNumbersAndAdd(delimiter, string);
+    }
+
+    private Integer checkNumbersAndAdd(String delimiter, String s) {
         List<String> numbers = extractNumberAsStrings(delimiter, s);
 
-        Optional<Integer> sum = numbers.stream().map(Integer::parseInt).reduce(Integer::sum);
+        Optional<Integer> negativeNumber = numbers.
+                stream().
+                map(Integer::parseInt).
+                filter(i -> i < 0).
+                findFirst();
 
+        if (negativeNumber.isPresent()) throw new RuntimeException(String.format("negatives not allowed %s", negativeNumber.get()));
+        else return add(numbers);
+    }
+
+    private Integer add(List<String> numbers) {
+        Optional<Integer> sum = numbers.stream().map(Integer::parseInt).reduce(Integer::sum);
         if (sum.isPresent()) return sum.get();
         else throw new RuntimeException("Something bad happened");
     }
@@ -40,10 +51,8 @@ public class StringCalculator {
         return Arrays.asList(usefulString.split(Pattern.quote(delimiter))); // Pattern.quote to avoid problems with regex special keywords
     }
 
-
-    private String extractUsefulString(String s) {
+    private String extractString(String s) {
         return s.substring(4);
-
     }
 
 }
