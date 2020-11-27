@@ -70,6 +70,19 @@ public class StringCalculatorTest {
     void whenGivenStringHasNegativeNumbers_ThrowError(){
         RuntimeException thrown  = assertThrows(RuntimeException.class, () -> stringCalculator.checkLengthAndAdd("10,-1,5"));
         assertTrue(thrown.getMessage().contains("negatives not allowed -1"));
+
+        RuntimeException thrown2 = assertThrows(RuntimeException.class, () -> stringCalculator.checkLengthAndAdd("//|\n9|22|-100"));
+        assertTrue(thrown2.getMessage().contains("negatives not allowed -100"));
+    }
+
+    @Test
+    void whenGivenStringHasMultipleNegativeNumbers_ThrowErrorAndShowThemAll(){
+        RuntimeException thrown = assertThrows(RuntimeException.class, () -> stringCalculator.checkLengthAndAdd("-2,-6,-200"));
+        assertTrue(thrown.getMessage().contains("negatives not allowed -2 -6 -200"));
+
+        RuntimeException thrown2 = assertThrows(RuntimeException.class, () -> stringCalculator.checkLengthAndAdd("//|\n-99|-22|-100"));
+        assertTrue(thrown2.getMessage().contains("negatives not allowed -99 -22 -100"));
+
     }
 
 

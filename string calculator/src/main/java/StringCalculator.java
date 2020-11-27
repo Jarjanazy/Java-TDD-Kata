@@ -30,14 +30,26 @@ public class StringCalculator {
     private Integer checkNumbersAndAdd(String delimiter, String s) {
         List<String> numbers = extractNumberAsStrings(delimiter, s);
 
-        Optional<Integer> negativeNumber = numbers.
+        if (hasNegativeNumbers(numbers)) throwErrorWithNegativeValuesMessage(numbers);
+
+        return add(numbers);
+    }
+
+    private void throwErrorWithNegativeValuesMessage(List<String> numbers) {
+        StringBuilder baseMessage = new StringBuilder("negatives not allowed");
+        numbers.
                 stream().
                 map(Integer::parseInt).
                 filter(i -> i < 0).
-                findFirst();
+                forEach(i -> baseMessage.append(" ").append(i));
+        throw new RuntimeException(baseMessage.toString());
+    }
 
-        if (negativeNumber.isPresent()) throw new RuntimeException(String.format("negatives not allowed %s", negativeNumber.get()));
-        else return add(numbers);
+    private boolean hasNegativeNumbers(List<String> numbers) {
+        return numbers.
+                stream().
+                map(Integer::parseInt).
+                anyMatch(i -> i < 0);
     }
 
     private Integer add(List<String> numbers) {
