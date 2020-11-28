@@ -5,14 +5,20 @@ import java.util.regex.Pattern;
 
 public class StringCalculator {
     private final String defaultDelimiter = ",";
+    private int calledCount = 0;
 
     public int checkLengthAndAdd(String s){
+        calledCount++;
         String trimmedString = s.trim();
 
         if (trimmedString.isEmpty()) return 0;
         else if (trimmedString.length() == 1) return Integer.parseInt(trimmedString);
 
         return checkDelimiterAndAddNumbers(trimmedString);
+    }
+
+    public int getCalledCount(){
+        return calledCount;
     }
 
 
@@ -53,7 +59,11 @@ public class StringCalculator {
     }
 
     private Integer add(List<String> numbers) {
-        Optional<Integer> sum = numbers.stream().map(Integer::parseInt).reduce(Integer::sum);
+        Optional<Integer> sum = numbers.
+                stream().
+                map(Integer::parseInt).
+                filter(i -> i <= 1000).
+                reduce(Integer::sum);
         if (sum.isPresent()) return sum.get();
         else throw new RuntimeException("Something bad happened");
     }
@@ -66,5 +76,4 @@ public class StringCalculator {
     private String extractString(String s) {
         return s.substring(4);
     }
-
 }

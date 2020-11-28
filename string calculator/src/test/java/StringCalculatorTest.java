@@ -85,5 +85,31 @@ public class StringCalculatorTest {
 
     }
 
+    @Test
+    void whenAddMethodIsCalled3Times_DetectIt(){
+        stringCalculator.checkLengthAndAdd("1,2,3,4,5,6");
+        stringCalculator.checkLengthAndAdd("10,20,30,40");
+        stringCalculator.checkLengthAndAdd("7,9");
+        assertEquals(3, stringCalculator.getCalledCount());
+    }
+
+    @Test
+    void whenAddMethodIsCalled5Times_DetectIt(){
+        stringCalculator.checkLengthAndAdd("1,2,3,4,5,6");
+        stringCalculator.checkLengthAndAdd("10,20,30,40");
+        stringCalculator.checkLengthAndAdd("7,9");
+        stringCalculator.checkLengthAndAdd("2,9");
+        stringCalculator.checkLengthAndAdd("5,9");
+        assertEquals(5, stringCalculator.getCalledCount());
+    }
+
+    @Test
+    void whenGivenStringHasNumberBiggerThan1000_IgnoreIt(){
+        int result = stringCalculator.checkLengthAndAdd("3,5,1009");
+        assertEquals(8, result);
+
+        int result2 = stringCalculator.checkLengthAndAdd("//.\n10.20.2000");
+        assertEquals(30, result2);
+    }
 
 }
