@@ -28,9 +28,22 @@ public class StringCalculator {
     }
 
     private Integer extractDelimiterAndAdd(String s) {
-        String delimiter = s.substring(2, 3);
+        String delimiter = extractDelimiter(s);
         String string = extractString(s);
         return checkNumbersAndAdd(delimiter, string);
+    }
+
+    private String extractDelimiter(String s) {
+        if(hasMultiCharacterDelimiter(s)) return extractMultiCharacterDelimiter(s);
+        return s.substring(2, 3);
+    }
+
+    private String extractMultiCharacterDelimiter(String s) {
+        return s.substring(3, s.lastIndexOf("]"));
+    }
+
+    private boolean hasMultiCharacterDelimiter(String s) {
+        return s.matches(".*\\[.*\\]((.*|\\n)*)");
     }
 
     private Integer checkNumbersAndAdd(String delimiter, String s) {
@@ -74,6 +87,7 @@ public class StringCalculator {
     }
 
     private String extractString(String s) {
+        if (hasMultiCharacterDelimiter(s)) return s.substring(s.lastIndexOf("]") + 2);
         return s.substring(4);
     }
 }

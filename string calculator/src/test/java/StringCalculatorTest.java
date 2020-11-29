@@ -112,4 +112,13 @@ public class StringCalculatorTest {
         assertEquals(30, result2);
     }
 
+    @Test
+    void whenGivenStringHasDelimiterOfManyCharacters_AddAndReturnNumbers(){
+        int result = stringCalculator.checkLengthAndAdd("//[**]\n4**5**12");
+        assertEquals(21, result);
+
+        int result2 = stringCalculator.checkLengthAndAdd("//[|||]\n2|||7|||13");
+        assertEquals(22, result2);
+    }
+
 }
