@@ -1,6 +1,5 @@
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringCalculator {
@@ -24,30 +23,39 @@ public class StringCalculator {
 
     private Integer checkDelimiterAndAddNumbers(String s) {
         if (s.startsWith("//")) return extractDelimiterAndAdd(s);
-        else return checkNumbersAndAdd(defaultDelimiter, s);
+        else return checkNumbersAndAdd(new ArrayList<>(Collections.singletonList(defaultDelimiter)), s);
     }
 
     private Integer extractDelimiterAndAdd(String s) {
-        String delimiter = extractDelimiter(s);
+        List<String> delimiters = extractDelimiters(s);
         String string = extractString(s);
-        return checkNumbersAndAdd(delimiter, string);
+        return checkNumbersAndAdd(delimiters, string);
     }
 
-    private String extractDelimiter(String s) {
-        if(hasMultiCharacterDelimiter(s)) return extractMultiCharacterDelimiter(s);
-        return s.substring(2, 3);
+    private List<String> extractDelimiters(String s) {
+        if(hasDelimitersInBrackets(s)) return extractDelimitersFromBrackets(s);
+        return new ArrayList<>(Collections.singletonList(s.substring(2, 3)));
     }
 
-    private String extractMultiCharacterDelimiter(String s) {
-        return s.substring(3, s.lastIndexOf("]"));
+    private List<String> extractDelimitersFromBrackets(String s) {
+        List<String> delimiters = new ArrayList<>();
+        Matcher m = Pattern.compile("\\[.*?\\]").matcher(s);
+        while (m.find()) { delimiters.add(getDelimiterFromWithinTheBracket(m)); }
+        return delimiters;
     }
 
-    private boolean hasMultiCharacterDelimiter(String s) {
+    private String getDelimiterFromWithinTheBracket(Matcher m) {
+        String delimiter = m.group();
+        return delimiter.substring(1, delimiter.length()-1);
+    }
+
+    private boolean hasDelimitersInBrackets(String s) {
         return s.matches(".*\\[.*\\]((.*|\\n)*)");
     }
 
-    private Integer checkNumbersAndAdd(String delimiter, String s) {
-        List<String> numbers = extractNumberAsStrings(delimiter, s);
+    private Integer checkNumbersAndAdd(List<String> delimiters, String s) {
+        List<String> numbers = new ArrayList<>();
+        extractNumbersAsStrings(delimiters, s, numbers);
 
         if (hasNegativeNumbers(numbers)) throwErrorWithNegativeValuesMessage(numbers);
 
@@ -81,13 +89,30 @@ public class StringCalculator {
         else throw new RuntimeException("Something bad happened");
     }
 
-    private List<String> extractNumberAsStrings(String delimiter, String s) {
+    private void extractNumbersAsStrings(List<String> delimiters, String s, List<String> numbers) {
+        if(stringCantBeSplit(s, delimiters)) numbers.add(s);
+
+        else{
+            String currentDelimiter = delimiters.remove(0);
+
+            List<String> stringsByDelimiter = splitStringByDelimiter(currentDelimiter, s);
+
+            stringsByDelimiter.forEach(stringByDelimiter -> extractNumbersAsStrings(delimiters, stringByDelimiter, numbers));
+        }
+    }
+
+    private boolean stringCantBeSplit(String s, List<String> delimiters) {
+        return delimiters.stream().noneMatch(d -> s.split(Pattern.quote(d)).length > 1);
+    }
+
+    private List<String> splitStringByDelimiter(String delimiter, String s) {
         String usefulString = s.replace("\n", delimiter);
         return Arrays.asList(usefulString.split(Pattern.quote(delimiter))); // Pattern.quote to avoid problems with regex special keywords
     }
 
+
     private String extractString(String s) {
-        if (hasMultiCharacterDelimiter(s)) return s.substring(s.lastIndexOf("]") + 2);
+        if (hasDelimitersInBrackets(s)) return s.substring(s.indexOf("\n") + 1);
         return s.substring(4);
     }
 }
