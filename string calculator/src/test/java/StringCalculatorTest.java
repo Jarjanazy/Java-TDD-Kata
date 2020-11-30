@@ -130,4 +130,13 @@ public class StringCalculatorTest {
         assertEquals(150, result2);
     }
 
+    @Test
+    void whenGivenStringHasMultipleDelimitersOfManyCharacters_AddAndReturnThem(){
+        int result = stringCalculator.checkLengthAndAdd("//[**][,,]\n1**0,,25");
+        assertEquals(26, result);
+
+        int result2 = stringCalculator.checkLengthAndAdd("//[,,][|][--]\n11,,22|30--40,,50");
+        assertEquals(153, result2);
+    }
+
 }
